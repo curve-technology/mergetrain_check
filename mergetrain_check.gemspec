@@ -1,7 +1,7 @@
 require_relative 'lib/mergetrain_check/version'
 
 Gem::Specification.new do |spec|
-  spec.name = "Gitlab-mergetrain-checker"
+  spec.name = "gitlab-mergetrain-checker"
   spec.version = MergetrainCheck::VERSION
   spec.date = %q{2020-04-29}
   spec.authors = ["Fabio Gallonetto"]
