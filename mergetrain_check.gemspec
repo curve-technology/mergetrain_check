@@ -17,4 +17,6 @@ Gem::Specification.new do |spec|
   end
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+
+  spec.add_runtime_dependency 'ruby-keychain', '~> 0.3.2'
 end
