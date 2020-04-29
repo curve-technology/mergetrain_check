@@ -1,31 +1,41 @@
-require "mergetrain_check/version"
+require 'mergetrain_check/config'
+require 'mergetrain_check/args_parser'
+require 'mergetrain_check/checker'
+require 'mergetrain_check/formatter'
 
 module MergetrainCheck
-  class Error < StandardError; end
-  
-  class Command
-    def run(argv)
-      options = {}
-      printers = Array.new
-      OptionParser.new do |opts|
-        opts.banner = "Usage: mergetrain_check [options]\n"
-        opts.on("-f", "--filters FILTERS", Array, "File extension filters") do |filters|
-          options[:filters] = filters
-        end
-        opts.on("-x", "--duplicates-hex", "Prints duplicate files by MD5 hexdigest") do |dh|
-          printers << "dh"
-        end
-        opts.on("-d", "--duplicates-name", "Prints duplicate files by file name") do |dh|
-          printers << "dn"
-        end
-        opts.on("-s", "--singles-hex", "Prints non-duplicate files by MD5 hexdigest") do |dh|
-          printers << "sh"
-        end
-        opts.on("-n", "--singles-name", "Prints non-duplicate files by file name") do |dh|
-          printers << "sn"
-        end
-      end.parse!
+  class MissingConfigError < StandardError
+    def initialize(description)
+      super(description)
     end
   end
 
-end
+  class Command
+    @host = "www.gitlab.com"
+    @project = -1
+    @token = -1
+
+    def self.run!(args)
+      config = Config.new
+      parser = ArgsParser.new
+      args = ArgsParser.new.parse(args)
+      config.merge! args
+
+      if config.auth_token.nil?
+        raise MissingConfigError, "auth_token"
+      end
+
+      if config.project_id.nil?
+        raise MissingConfigError, "project_id"
+      end
+
+      checker = Checker.new(config.gitlab_host, config.auth_token, config.project_id)
+      traintable = checker.check
+
+      formatter = TraintableFormatter.new 80, true
+      puts formatter.format traintable
+      config.save!
+    end
+  end
+ end
+

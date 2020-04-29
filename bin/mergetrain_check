@@ -3,4 +3,14 @@
 require "bundler/setup"
 require "mergetrain_check"
 
-MergetrainCheck::Command.run(ARGV)
+begin
+  MergetrainCheck::Command.run!(ARGV)
+rescue MergetrainCheck::MissingConfigError => e
+  puts "ERROR: #{e.message} parameter is required"
+rescue OptionParser::InvalidArgument => e
+  puts "ERROR: #{e.message}"
+rescue JSON::ParserError => e
+  puts "Unable to parse server response"
+rescue SocketError => e
+  puts "Unable to connect to server"
+end
