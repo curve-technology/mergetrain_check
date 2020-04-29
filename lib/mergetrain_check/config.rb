@@ -43,11 +43,11 @@ module MergetrainCheck
     end
 
     def auth_token
-      @config[:token]
+      @tokenStorage.password
     end
 
     def auth_token=(value)
-      @config[:token] = value
+      @tokenStorage.password = value
     end
 
     def project_id
@@ -59,9 +59,9 @@ module MergetrainCheck
     end
 
     def merge!(config_hash)
-      @config.merge! config_hash
+      @config.merge! config_hash.reject { |k,v| k == :token }
       @tokenStorage = AuthTokenStorage.new(gitlab_host)
-      @tokenStorage.password = @config[:token]
+      @tokenStorage.password = config_hash[:token] unless config_hash[:token].nil?
     end
 
     def initialize(file = DEFAULT_CONFIG_FILE)
@@ -72,7 +72,6 @@ module MergetrainCheck
         @config = {}
       end
       @tokenStorage = AuthTokenStorage.new(gitlab_host)
-      @config[:token] = @tokenStorage.password
     end
 
     def save!(file = DEFAULT_CONFIG_FILE)

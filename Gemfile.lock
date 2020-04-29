@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    Gitlab-mergetrain-checker (0.1.0)
+    gitlab-mergetrain-checker (1.0.0)
       ruby-keychain (~> 0.3.2)
 
 GEM
@@ -19,7 +19,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  Gitlab-mergetrain-checker!
+  gitlab-mergetrain-checker!
   rake (~> 12.0)
 
 BUNDLED WITH
