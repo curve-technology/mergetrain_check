@@ -19,6 +19,7 @@ module MergetrainCheck
       config = Config.new
       parser = ArgsParser.new
       args = ArgsParser.new.parse(args)
+      return if args.nil?
       config.merge! args
 
       if config.auth_token.nil?

@@ -7,7 +7,7 @@ module MergetrainCheck
       parser = OptionParser.new do |opts|
         opts.banner = "Usage: mergetrain_check [options] [PROJECT-ID]\n" +
           "       PROJECT-ID: The project ID to fetch the merge train list from. If none specified, it will try to use the last one used.\n\n"
-        opts.on("-t", "--token GITLAB-PERSONAL-TOKEN", "Gitlab API token (go to https://gitlab.com/profile/personal_access_tokens) to generate one.") do |t|      
+        opts.on("-t", "--token GITLAB-PERSONAL-TOKEN", "Gitlab API token (go to https://[gitlab_host]/profile/personal_access_tokens) to generate one.") do |t|
           options[:token] = t
         end
         opts.on("-n", "--host GITLAB-HOSTNAME", "Specify the Gitlab installation host (in case it's not gitlab.com)") do |host|
@@ -15,6 +15,7 @@ module MergetrainCheck
         end
         opts.on("-h", "--help", "Prints this help") do
           puts opts
+          return nil
         end
       end
       parser.parse!(args)
