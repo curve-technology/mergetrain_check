@@ -82,7 +82,7 @@ class Numeric
      result << "#{days}D " if days > 0
      result << "#{hours}h" if hours > 0
      result << "#{mins}m" if mins > 0
-     result << "#{secs.to_i}s" if secs > 0
-     return result.join(':')
+     result << "#{secs.to_i}s" if secs.to_i > 0
+     return result.join(' ')
     end
 end
