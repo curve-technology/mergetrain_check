@@ -1,6 +1,7 @@
 require 'yaml'
 require 'fileutils'
 require 'keychain'
+require 'mergetrain_check/error'
 
 module MergetrainCheck
   class AuthTokenStorage
@@ -26,15 +27,19 @@ module MergetrainCheck
 
   DEFAULT_CONFIG_FILE = File.expand_path('~/.mergetraincheck')
 
-  class FileNotFoundError < StandardError
-    def initialize(description)
-      super(description)
-    end
-  end
+  class FileNotFoundError < CheckerError; end
 
   class Config
     def gitlab_host
       @config[:host] || "www.gitlab.com"
+    end
+
+    def verbose
+      @config[:verbose]
+    end
+
+    def verbose=(value)
+      @confing[:verbose] = value
     end
 
     def gitlab_host=(value)
@@ -75,8 +80,13 @@ module MergetrainCheck
     end
 
     def save!(file = DEFAULT_CONFIG_FILE)
-      File.open(file, 'w') { |f| f.write(@config.to_yaml) }
+            File.open(file, 'w') { |f| f.write(config_to_persist.to_yaml) }
       @tokenStorage.save!
+    end
+
+    private
+    def config_to_persist
+      @config.reject { |k,v| ![:project_id, :host].include?(k) }
     end
   end
 end

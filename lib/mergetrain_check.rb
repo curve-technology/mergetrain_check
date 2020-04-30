@@ -2,13 +2,11 @@ require 'mergetrain_check/config'
 require 'mergetrain_check/args_parser'
 require 'mergetrain_check/checker'
 require 'mergetrain_check/formatter'
+require 'mergetrain_check/error'
 
 module MergetrainCheck
-  class MissingConfigError < StandardError
-    def initialize(description)
-      super(description)
-    end
-  end
+
+  class MissingConfigError < CheckerError; end
 
   class Command
     @host = "www.gitlab.com"
@@ -33,7 +31,9 @@ module MergetrainCheck
       checker = Checker.new(config.gitlab_host, config.auth_token, config.project_id)
       traintable = checker.check
 
-      formatter = TraintableFormatter.new 80, true
+      text_length = config.verbose ? 160: 80
+      first_name_only = !config.verbose
+      formatter = TraintableFormatter.new text_length, first_name_only
       puts formatter.format traintable
       config.save!
     end
