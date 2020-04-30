@@ -7,7 +7,7 @@ module MergetrainCheck
       @host = host
       @token = token
       @id = id
-      @uri =  URI("https://#{host}/api/v4/projects/#{id}/merge_trains")
+      @uri =  URI("https://#{host}/api/v4/projects/#{id}/merge_trains?per_page=100")
     end
 
     def check

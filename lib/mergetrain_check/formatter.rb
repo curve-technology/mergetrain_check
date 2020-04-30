@@ -1,3 +1,5 @@
+require 'date'
+
 module MergetrainCheck
   class TraintableFormatter
     def initialize(max_length, firstname_only)
@@ -6,9 +8,15 @@ module MergetrainCheck
     end
 
     def format(body)
-      values = [['St', 'MR', 'Pipe ID', 'User', 'Title']]
+      values = [['St', 'Waiting', 'Running', 'MR', 'Pipe ID', 'User', 'Title']]
       body.each do |carriage|
+        begin_time = date_from_string carriage['created_at']
+        pipeline_begin_time = date_from_string carriage['pipeline']['created_at']
+        end_time = carriage['merged_at'].nil? ? DateTime.now : date_from_string(carriage['merged_at'])
+
         values << [pipeline_status(carriage['status']),
+                   pretty_date_difference(begin_time, pipeline_begin_time),
+                   pretty_date_difference(pipeline_begin_time, end_time),
                    carriage['merge_request']['iid'],
                    carriage['pipeline']['id'],
                    @firstname_only ? carriage['user']['name'].split.first : carriage['user']['name'],
@@ -29,7 +37,13 @@ module MergetrainCheck
       "#{string[0...len]}..."
     end
 
+    def date_from_string(datestring)
+      DateTime.parse(datestring, '%Q')
+    end
 
+    def pretty_date_difference(from, to)
+      (to.to_time - from.to_time).duration
+    end
   end
 end
 
@@ -56,5 +70,19 @@ class Array
   def count_emojis(string)
     string.scan(/[\u{1F300}-\u{1F5FF}|\u{1F1E6}-\u{1F1FF}|\u{2700}-\u{27BF}|\u{1F900}-\u{1F9FF}|\u{1F600}-\u{1F64F}|\u{1F680}-\u{1F6FF}|\u{2600}-\u{26FF}]/).length
   end
+end
 
+class Numeric
+   def duration
+     rest, secs = self.divmod( 60 )  # self is the time difference t2 - t1
+     rest, mins = rest.divmod( 60 )
+     days, hours = rest.divmod( 24 )
+
+     result = []
+     result << "#{days}D " if days > 0
+     result << "#{hours}h" if hours > 0
+     result << "#{mins}m" if mins > 0
+     result << "#{secs.to_i}s" if secs > 0
+     return result.join(':')
+    end
 end

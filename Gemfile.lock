@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gitlab-mergetrain-checker (1.0.1)
+    gitlab-mergetrain-checker (1.0.2)
       ruby-keychain (~> 0.3.2)
 
 GEM
