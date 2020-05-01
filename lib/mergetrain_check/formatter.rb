@@ -22,7 +22,12 @@ module MergetrainCheck
                    @firstname_only ? carriage['user']['name'].split.first : carriage['user']['name'],
                    truncate_string(carriage['merge_request']['title'], @max_length)]
       end
-      values.to_table
+
+      header = ''
+      if has_train_finished? body
+        header = "\n  ✋ 🚉 The train is at the station: There are currently no running merge trains!\n\n"
+      end
+       header + values.to_table
     end
 
     private
@@ -44,25 +49,30 @@ module MergetrainCheck
     def pretty_date_difference(from, to)
       (to.to_time - from.to_time).duration
     end
+
+    def has_train_finished?(data)
+      data.first['status'] != 'fresh'
+    end
   end
 end
 
 class Array
   def to_table
+    output = ''
     column_sizes = self.reduce([]) do |lengths, row|
       row.each_with_index.map{|iterand, index| [lengths[index] || 0, iterand.to_s.length + count_emojis(iterand.to_s)].max}
     end
-    puts head = '-' * (column_sizes.inject(&:+) + (3 * column_sizes.count) + 1)
+    output += head = '-' * (column_sizes.inject(&:+) + (3 * column_sizes.count) + 1) + "\n"
     self.each_with_index do |row, idx|
       row = row.fill(nil, row.size..(column_sizes.size - 1))
       row = row.each_with_index.map{|v, i| v = v.to_s + ' ' * (column_sizes[i] - v.to_s.length - count_emojis(v.to_s))}
-      puts '| ' + row.join(' | ') + ' |'
+      output += '| ' + row.join(' | ') + ' |' + "\n"
       if idx == 0
         row = row.each_with_index.map{|v, i| v = '-' * v.to_s.length}
-        puts '| ' + row.join(' | ') + ' |'
+        output += '| ' + row.join(' | ') + ' |' + "\n"
       end
     end
-    puts head
+    output += head
   end
 
   private
