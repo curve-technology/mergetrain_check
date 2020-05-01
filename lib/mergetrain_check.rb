@@ -29,6 +29,7 @@ module MergetrainCheck
       end
 
       checker = Checker.new(config.gitlab_host, config.auth_token, config.project_id)
+      checker.max_completed = config.limit
       traintable = checker.check
 
       text_length = config.verbose ? 160: 80

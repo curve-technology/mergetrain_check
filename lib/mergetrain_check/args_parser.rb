@@ -13,6 +13,9 @@ module MergetrainCheck
         opts.on("-n", "--host GITLAB-HOSTNAME", "Specify the Gitlab installation host (in case it's not gitlab.com)") do |host|
           options[:host] = host
         end
+        opts.on("-l", "--limit COUNT", "Limit completed jobs to COUNT entries (default 10)") do |limit|
+          options[:limit] = limit
+        end
         opts.on("-v", "--verbose", "Verbose output (larger table)") do |verbose|
           options[:verbose] = verbose
         end

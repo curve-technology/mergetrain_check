@@ -47,6 +47,14 @@ module MergetrainCheck
       @tokenStorage = AuthTokenStorage.new(value)
     end
 
+    def limit
+      @config[:limit] || 10
+    end
+
+    def limit=(value)
+      @config[:limit] = value
+    end
+
     def auth_token
       @tokenStorage.password
     end
