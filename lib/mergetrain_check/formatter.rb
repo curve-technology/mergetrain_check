@@ -9,10 +9,17 @@ module MergetrainCheck
 
     def format(body)
       values = [['St', 'Waiting', 'Running', 'MR', 'Pipe ID', 'User', 'Title']]
+      values << spacer = nil
+
+      previous_state = body.first['status']
       body.each do |carriage|
         begin_time = date_from_string carriage['created_at']
         pipeline_begin_time = date_from_string carriage['pipeline']['created_at']
         end_time = carriage['merged_at'].nil? ? DateTime.now : date_from_string(carriage['merged_at'])
+
+        is_finished_section = previous_state != carriage['status']
+        previous_state = carriage['status']
+        values << spacer if is_finished_section
 
         values << [pipeline_status(carriage['status']),
                    pretty_date_difference(begin_time, pipeline_begin_time),
@@ -60,15 +67,20 @@ class Array
   def to_table
     output = ''
     column_sizes = self.reduce([]) do |lengths, row|
-      row.each_with_index.map{|iterand, index| [lengths[index] || 0, iterand.to_s.length + count_emojis(iterand.to_s)].max}
+      if row.nil?
+        lengths
+      else
+        row.each_with_index.map{|iterand, index| [lengths[index] || 0, iterand.to_s.length + count_emojis(iterand.to_s)].max}
+      end
     end
     output += head = '-' * (column_sizes.inject(&:+) + (3 * column_sizes.count) + 1) + "\n"
     self.each_with_index do |row, idx|
-      row = row.fill(nil, row.size..(column_sizes.size - 1))
-      row = row.each_with_index.map{|v, i| v = v.to_s + ' ' * (column_sizes[i] - v.to_s.length - count_emojis(v.to_s))}
-      output += '| ' + row.join(' | ') + ' |' + "\n"
-      if idx == 0
-        row = row.each_with_index.map{|v, i| v = '-' * v.to_s.length}
+      if row.nil?
+        row = column_sizes.map { |l| '-' * l }
+        output += '| ' + row.join(' | ') + ' |' + "\n"
+      else
+        row = row.fill(nil, row.size..(column_sizes.size - 1))
+        row = row.each_with_index.map{|v, i| v = v.to_s + ' ' * (column_sizes[i] - v.to_s.length - count_emojis(v.to_s))}
         output += '| ' + row.join(' | ') + ' |' + "\n"
       end
     end
