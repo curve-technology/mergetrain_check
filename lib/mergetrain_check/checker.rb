@@ -39,7 +39,7 @@ module MergetrainCheck
     end
 
     def active_uri
-      URI("https://#{@host}/api/v4/projects/#{@id}/merge_trains?per_page=100&scope=active")
+      URI("https://#{@host}/api/v4/projects/#{@id}/merge_trains?per_page=100&scope=active&sort=asc")
     end
   end
 end
